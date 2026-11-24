@@ -24,3 +24,9 @@ class Organization(Base):
         "User",
         back_populates="organization"
     )
+
+    products = relationship(
+        "Product",
+        back_populates="organization",
+        cascade="all, delete-orphan"
+    )

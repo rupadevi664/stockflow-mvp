@@ -5,11 +5,19 @@ from app.schemas.auth import (
     LoginResponse,
     UserProfileResponse
 )
+from app.schemas.product import (
+    ProductCreate,
+    ProductUpdate,
+    ProductResponse
+)
 
 __all__ = [
     "SignupRequest",
     "SignupResponse",
     "LoginRequest",
     "LoginResponse",
-    "UserProfileResponse"
+    "UserProfileResponse",
+    "ProductCreate",
+    "ProductUpdate",
+    "ProductResponse"
 ]
