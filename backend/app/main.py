@@ -4,7 +4,9 @@ from app.core.config import settings
 from app.database import Base, engine
 from app import models
 from app.routes.auth import router as auth_router
+from app.routes.stock import router as stock_router
 from app.routes.products import router as products_router
+
 
 
 
@@ -19,9 +21,11 @@ app = FastAPI(
 Base.metadata.create_all(bind=engine)
 
 
-# Register authentication routes
+# Register routes (stock_router registered before products_router to prevent route collision with /products/{product_id})
 app.include_router(auth_router)
+app.include_router(stock_router)
 app.include_router(products_router)
+
 
 
 
