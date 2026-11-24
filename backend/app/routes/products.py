@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -35,6 +35,7 @@ def create_product(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    # Check if SKU already exists within the user's organization
     existing_product = db.query(Product).filter(
         Product.organization_id == current_user.organization_id,
         Product.sku == data.sku
@@ -76,25 +77,34 @@ def create_product(
         )
 
 
-# 2. GET ALL PRODUCTS FOR USER'S ORGANIZATION
+# 2. GET ALL PRODUCTS (WITH PAGINATION AND SEARCH)
 @router.get(
     "/",
     response_model=List[ProductResponse],
-    summary="List products for the authenticated organization"
+    summary="List and search products for the authenticated organization"
 )
 def get_products(
     skip: int = Query(0, ge=0, description="Number of records to skip"),
     limit: int = Query(10, ge=1, le=100, description="Maximum number of records to return"),
+    search: Optional[str] = Query(None, description="Search term for product name or SKU"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     skip_val = skip.default if hasattr(skip, "default") else skip
     limit_val = limit.default if hasattr(limit, "default") else limit
+    search_val = search.default if hasattr(search, "default") else search
 
-    products = db.query(Product).filter(
+    query = db.query(Product).filter(
         Product.organization_id == current_user.organization_id
-    ).offset(skip_val).limit(limit_val).all()
+    )
 
+    if search_val:
+        search_filter = f"%{search_val}%"
+        query = query.filter(
+            (Product.name.ilike(search_filter)) | (Product.sku.ilike(search_filter))
+        )
+
+    products = query.offset(skip_val).limit(limit_val).all()
     return products
 
 
