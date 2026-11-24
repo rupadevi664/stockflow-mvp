@@ -1,4 +1,7 @@
+from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 class Settings(BaseSettings):
@@ -13,13 +16,14 @@ class Settings(BaseSettings):
     DATABASE_USER: str = "root"
     DATABASE_PASSWORD: str = ""
 
+    SECRET_KEY: str = "default_secret_key_for_development_change_in_production"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(str(BASE_DIR / ".env"), ".env"),
         extra="ignore"
     )
 
 
 settings = Settings()
-SECRET_KEY: str
-ALGORITHM: str = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES: int = 30

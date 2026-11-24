@@ -1,12 +1,23 @@
 from fastapi import FastAPI
+
+from app.core.config import settings
+from app.database import Base, engine
+from app import models
 from app.routes.auth import router as auth_router
 
+
 app = FastAPI(
-    title="StockFlow MVP",
-    description="SaaS Inventory Management System",
-    version="1.0.0"
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION,
+    description="SaaS Inventory Management System"
 )
 
+
+# Create database tables for the MVP
+Base.metadata.create_all(bind=engine)
+
+
+# Register authentication routes
 app.include_router(auth_router)
 
 
@@ -20,4 +31,6 @@ def home():
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy"}
+    return {
+        "status": "healthy"
+    }
