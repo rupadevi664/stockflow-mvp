@@ -15,9 +15,32 @@ class Organization(Base):
         nullable=False
     )
 
+    contact_email = Column(
+        String(150),
+        nullable=True
+    )
+
+    contact_phone = Column(
+        String(50),
+        nullable=True
+    )
+
+    default_low_stock_threshold = Column(
+        Integer,
+        nullable=False,
+        default=5,
+        server_default="5"
+    )
+
     created_at = Column(
         DateTime(timezone=True),
         server_default=func.now()
+    )
+
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now()
     )
 
     users = relationship(

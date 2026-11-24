@@ -4,9 +4,11 @@ from app.core.config import settings
 from app.database import Base, engine
 from app import models
 from app.routes.auth import router as auth_router
+from app.routes.organization import router as organization_router
 from app.routes.dashboard import router as dashboard_router
 from app.routes.stock import router as stock_router
 from app.routes.products import router as products_router
+
 
 
 
@@ -25,9 +27,11 @@ Base.metadata.create_all(bind=engine)
 
 # Register routes
 app.include_router(auth_router)
+app.include_router(organization_router)
 app.include_router(dashboard_router)
 app.include_router(stock_router)
 app.include_router(products_router)
+
 
 
 

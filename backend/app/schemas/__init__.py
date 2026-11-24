@@ -22,6 +22,11 @@ from app.schemas.dashboard import (
     DashboardSummaryResponse,
     InventoryValueResponse
 )
+from app.schemas.organization import (
+    OrganizationSettingsResponse,
+    OrganizationSettingsUpdate,
+    OrganizationSettingsRequest
+)
 
 __all__ = [
     "SignupRequest",
@@ -38,8 +43,12 @@ __all__ = [
     "StockUpdateRequest",
     "StockUpdateResponse",
     "DashboardSummaryResponse",
-    "InventoryValueResponse"
+    "InventoryValueResponse",
+    "OrganizationSettingsResponse",
+    "OrganizationSettingsUpdate",
+    "OrganizationSettingsRequest"
 ]
+
 
 
 
