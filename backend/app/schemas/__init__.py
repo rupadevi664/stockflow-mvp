@@ -12,6 +12,13 @@ from app.schemas.product import (
     ProductDeleteResponse
 )
 
+from app.schemas.stock import (
+    StockAdjustmentRequest,
+    StockAdjustmentResponse,
+    StockUpdateRequest,
+    StockUpdateResponse
+)
+
 __all__ = [
     "SignupRequest",
     "SignupResponse",
@@ -21,6 +28,11 @@ __all__ = [
     "ProductCreate",
     "ProductUpdate",
     "ProductResponse",
-    "ProductDeleteResponse"
+    "ProductDeleteResponse",
+    "StockAdjustmentRequest",
+    "StockAdjustmentResponse",
+    "StockUpdateRequest",
+    "StockUpdateResponse"
 ]
+
 
