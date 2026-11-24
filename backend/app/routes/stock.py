@@ -1,10 +1,12 @@
 import logging
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.product import Product
 from app.models.user import User
+from app.schemas.product import ProductResponse
 from app.schemas.stock import StockAdjustmentRequest, StockAdjustmentResponse
 from app.routes.auth import get_current_user
 
@@ -16,7 +18,26 @@ router = APIRouter(
 )
 
 
-# INCREASE STOCK
+# 1. LOW STOCK DETECTION
+@router.get(
+    "/low-stock",
+    response_model=List[ProductResponse],
+    summary="Get low stock products",
+    description="Retrieve products where current quantity is less than or equal to low_stock_threshold for the authenticated user's organization."
+)
+def get_low_stock_products(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    products = db.query(Product).filter(
+        Product.organization_id == current_user.organization_id,
+        Product.quantity <= Product.low_stock_threshold
+    ).all()
+
+    return products
+
+
+# 2. INCREASE STOCK
 @router.post(
     "/{product_id}/stock/increase",
     response_model=StockAdjustmentResponse,
@@ -69,7 +90,7 @@ def increase_stock(
         )
 
 
-# DECREASE STOCK
+# 3. DECREASE STOCK
 @router.post(
     "/{product_id}/stock/decrease",
     response_model=StockAdjustmentResponse,
