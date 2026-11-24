@@ -5,7 +5,7 @@ from app.database import get_db
 from app.models.user import User
 from app.models.organization import Organization
 from app.schemas.auth import SignupRequest, SignupResponse
-
+from app.core.security import hash_password
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -41,10 +41,10 @@ def signup(data: SignupRequest, db: Session = Depends(get_db)):
         user = User(
             name=data.name,
             email=data.email,
-            password_hash=data.password,
+            password_hash=hash_password(data.password),
             organization_id=organization.id
         )
-
+ 
         db.add(user)
         db.commit()
         db.refresh(user)
