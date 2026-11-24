@@ -4,6 +4,8 @@ from app.core.config import settings
 from app.database import Base, engine
 from app import models
 from app.routes.auth import router as auth_router
+from app.routes.products import router as products_router
+
 
 
 app = FastAPI(
@@ -19,6 +21,8 @@ Base.metadata.create_all(bind=engine)
 
 # Register authentication routes
 app.include_router(auth_router)
+app.include_router(products_router)
+
 
 
 @app.get("/")
