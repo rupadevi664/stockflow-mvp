@@ -61,17 +61,17 @@ const Dashboard = () => {
   return (
     <div>
       {/* Top Banner & Quick Controls */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+      <div className="dashboard-header-container">
         <div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--slate-900)' }}>
+          <h2 className="dashboard-main-heading">
             Inventory Overview
           </h2>
-          <p style={{ color: 'var(--slate-500)', fontSize: '0.875rem' }}>
-            Real-time aggregate stock levels, value analysis, and critical low-stock alerts.
+          <p className="dashboard-sub-heading">
+            Real-time aggregate stock levels and reorder alerts.
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
+        <div className="dashboard-action-buttons">
           <button
             type="button"
             className="btn btn-secondary"
@@ -188,60 +188,117 @@ const Dashboard = () => {
               </p>
             </div>
           ) : (
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>SKU</th>
-                  <th>Product Name</th>
-                  <th>Current Stock</th>
-                  <th>Low-Stock Threshold</th>
-                  <th>Unit Price</th>
-                  <th>Status</th>
-                  <th style={{ textAlign: 'right' }}>Quick Restock</th>
-                </tr>
-              </thead>
-              <tbody>
+            <>
+              {/* Desktop View: Full Table */}
+              <div className="desktop-only">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>SKU</th>
+                      <th>Product Name</th>
+                      <th>Current Stock</th>
+                      <th>Low-Stock Threshold</th>
+                      <th>Unit Price</th>
+                      <th>Status</th>
+                      <th style={{ textAlign: 'right' }}>Quick Restock</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {lowStockList.map((product) => (
+                      <tr key={product.id}>
+                        <td>
+                          <span className="sku-badge">{product.sku}</span>
+                        </td>
+                        <td>
+                          <div style={{ fontWeight: 600, color: 'var(--slate-900)' }}>{product.name}</div>
+                          {product.description && (
+                            <div style={{ fontSize: '0.775rem', color: 'var(--slate-500)', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {product.description}
+                            </div>
+                          )}
+                        </td>
+                        <td>
+                          <span style={{ fontWeight: 700, fontSize: '0.95rem', color: product.quantity === 0 ? 'var(--rose-600)' : 'var(--amber-600)' }}>
+                            {product.quantity} units
+                          </span>
+                        </td>
+                        <td>{product.low_stock_threshold} units</td>
+                        <td>{formatCurrency(product.price)}</td>
+                        <td>
+                          {product.quantity === 0 ? (
+                            <span className="badge badge-out-of-stock">Out of Stock</span>
+                          ) : (
+                            <span className="badge badge-low-stock">Low Stock</span>
+                          )}
+                        </td>
+                        <td style={{ textAlign: 'right' }}>
+                          <button
+                            type="button"
+                            className="btn btn-primary btn-sm"
+                            onClick={() => setSelectedProductForStock(product)}
+                          >
+                            <Plus size={14} />
+                            <span>Restock</span>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile View: High-End Restock Cards */}
+              <div className="mobile-only mobile-card-list">
                 {lowStockList.map((product) => (
-                  <tr key={product.id}>
-                    <td>
-                      <span className="sku-badge">{product.sku}</span>
-                    </td>
-                    <td>
-                      <div style={{ fontWeight: 600, color: 'var(--slate-900)' }}>{product.name}</div>
-                      {product.description && (
-                        <div style={{ fontSize: '0.775rem', color: 'var(--slate-500)', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {product.description}
-                        </div>
-                      )}
-                    </td>
-                    <td>
-                      <span style={{ fontWeight: 700, fontSize: '0.95rem', color: product.quantity === 0 ? 'var(--rose-600)' : 'var(--amber-600)' }}>
-                        {product.quantity} units
-                      </span>
-                    </td>
-                    <td>{product.low_stock_threshold} units</td>
-                    <td>{formatCurrency(product.price)}</td>
-                    <td>
+                  <div key={product.id} className="mobile-product-card">
+                    <div className="mobile-card-header">
+                      <div>
+                        <span className="sku-badge">{product.sku}</span>
+                        <h4 className="mobile-card-name">{product.name}</h4>
+                      </div>
                       {product.quantity === 0 ? (
                         <span className="badge badge-out-of-stock">Out of Stock</span>
                       ) : (
                         <span className="badge badge-low-stock">Low Stock</span>
                       )}
-                    </td>
-                    <td style={{ textAlign: 'right' }}>
-                      <button
-                        type="button"
-                        className="btn btn-primary btn-sm"
-                        onClick={() => setSelectedProductForStock(product)}
-                      >
-                        <Plus size={14} />
-                        <span>Restock</span>
-                      </button>
-                    </td>
-                  </tr>
+                    </div>
+
+                    <div className="mobile-card-stats" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+                      <div className="mobile-stat-col">
+                        <span className="mobile-stat-label">In Stock</span>
+                        <span
+                          className="mobile-stat-value"
+                          style={{
+                            color: product.quantity === 0 ? 'var(--rose-600)' : 'var(--amber-600)',
+                            fontWeight: 800
+                          }}
+                        >
+                          {product.quantity}
+                        </span>
+                      </div>
+                      <div className="mobile-stat-col">
+                        <span className="mobile-stat-label">Threshold</span>
+                        <span className="mobile-stat-value">{product.low_stock_threshold}</span>
+                      </div>
+                      <div className="mobile-stat-col">
+                        <span className="mobile-stat-label">Price</span>
+                        <span className="mobile-stat-value">{formatCurrency(product.price)}</span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      style={{ width: '100%', marginTop: '0.25rem', padding: '0.65rem' }}
+                      onClick={() => setSelectedProductForStock(product)}
+                    >
+                      <Plus size={16} />
+                      <span>Restock Item Now</span>
+                    </button>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </>
           )}
         </div>
       </div>
