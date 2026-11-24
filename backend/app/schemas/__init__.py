@@ -18,6 +18,10 @@ from app.schemas.stock import (
     StockUpdateRequest,
     StockUpdateResponse
 )
+from app.schemas.dashboard import (
+    DashboardSummaryResponse,
+    InventoryValueResponse
+)
 
 __all__ = [
     "SignupRequest",
@@ -32,7 +36,10 @@ __all__ = [
     "StockAdjustmentRequest",
     "StockAdjustmentResponse",
     "StockUpdateRequest",
-    "StockUpdateResponse"
+    "StockUpdateResponse",
+    "DashboardSummaryResponse",
+    "InventoryValueResponse"
 ]
+
 
 
