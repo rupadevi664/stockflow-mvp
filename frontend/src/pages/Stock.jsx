@@ -117,7 +117,7 @@ const Stock = () => {
           }}
         >
           {/* Tabs */}
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <div className="tabs-scroll-container">
             <button
               type="button"
               className={`btn btn-sm ${activeFilter === 'all' ? 'btn-primary' : 'btn-secondary'}`}
@@ -142,7 +142,7 @@ const Stock = () => {
           </div>
 
           {/* Search */}
-          <div style={{ position: 'relative', minWidth: '240px' }}>
+          <div className="stock-search-wrapper" style={{ position: 'relative' }}>
             <input
               type="text"
               className="form-control"
@@ -185,57 +185,98 @@ const Stock = () => {
               </p>
             </div>
           ) : (
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>SKU</th>
-                  <th>Product Name</th>
-                  <th>Threshold</th>
-                  <th>Current Stock</th>
-                  <th>Status</th>
-                  <th style={{ textAlign: 'right' }}>Quick Adjust</th>
-                </tr>
-              </thead>
-              <tbody>
+            <>
+              {/* Desktop View: Full Table */}
+              <div className="desktop-only">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>SKU</th>
+                      <th>Product Name</th>
+                      <th>Threshold</th>
+                      <th>Current Stock</th>
+                      <th>Status</th>
+                      <th style={{ textAlign: 'right' }}>Quick Adjust</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredProducts.map((p) => {
+                      const isLow = p.quantity <= p.low_stock_threshold && p.quantity > 0;
+                      const isOut = p.quantity === 0;
+
+                      return (
+                        <tr key={p.id}>
+                          <td>
+                            <span className="sku-badge">{p.sku}</span>
+                          </td>
+                          <td>
+                            <div style={{ fontWeight: 600, color: 'var(--slate-900)' }}>{p.name}</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--slate-500)' }}>
+                              ID #{p.id}
+                            </div>
+                          </td>
+                          <td>
+                            <span style={{ color: 'var(--slate-600)', fontWeight: 500 }}>
+                              {p.low_stock_threshold} units
+                            </span>
+                          </td>
+                          <td>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <span
+                                style={{
+                                  fontSize: '1.1rem',
+                                  fontWeight: 800,
+                                  color: isOut
+                                    ? 'var(--rose-600)'
+                                    : isLow
+                                    ? 'var(--amber-600)'
+                                    : 'var(--emerald-600)',
+                                }}
+                              >
+                                {p.quantity}
+                              </span>
+                              <span style={{ fontSize: '0.8rem', color: 'var(--slate-500)' }}>units</span>
+                            </div>
+                          </td>
+                          <td>
+                            {isOut ? (
+                              <span className="badge badge-out-of-stock">Out of Stock</span>
+                            ) : isLow ? (
+                              <span className="badge badge-low-stock">Low Stock</span>
+                            ) : (
+                              <span className="badge badge-in-stock">In Stock</span>
+                            )}
+                          </td>
+                          <td style={{ textAlign: 'right' }}>
+                            <button
+                              type="button"
+                              className="btn btn-primary btn-sm"
+                              onClick={() => setAdjustingProduct(p)}
+                            >
+                              <Layers size={14} />
+                              <span>Adjust Stock</span>
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile View: High-End Stock Cards */}
+              <div className="mobile-only mobile-card-list">
                 {filteredProducts.map((p) => {
                   const isLow = p.quantity <= p.low_stock_threshold && p.quantity > 0;
                   const isOut = p.quantity === 0;
 
                   return (
-                    <tr key={p.id}>
-                      <td>
-                        <span className="sku-badge">{p.sku}</span>
-                      </td>
-                      <td>
-                        <div style={{ fontWeight: 600, color: 'var(--slate-900)' }}>{p.name}</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--slate-500)' }}>
-                          ID #{p.id}
+                    <div key={p.id} className="mobile-product-card">
+                      <div className="mobile-card-header">
+                        <div>
+                          <span className="sku-badge">{p.sku}</span>
+                          <h4 className="mobile-card-name">{p.name}</h4>
                         </div>
-                      </td>
-                      <td>
-                        <span style={{ color: 'var(--slate-600)', fontWeight: 500 }}>
-                          {p.low_stock_threshold} units
-                        </span>
-                      </td>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <span
-                            style={{
-                              fontSize: '1.1rem',
-                              fontWeight: 800,
-                              color: isOut
-                                ? 'var(--rose-600)'
-                                : isLow
-                                ? 'var(--amber-600)'
-                                : 'var(--emerald-600)',
-                            }}
-                          >
-                            {p.quantity}
-                          </span>
-                          <span style={{ fontSize: '0.8rem', color: 'var(--slate-500)' }}>units</span>
-                        </div>
-                      </td>
-                      <td>
                         {isOut ? (
                           <span className="badge badge-out-of-stock">Out of Stock</span>
                         ) : isLow ? (
@@ -243,22 +284,43 @@ const Stock = () => {
                         ) : (
                           <span className="badge badge-in-stock">In Stock</span>
                         )}
-                      </td>
-                      <td style={{ textAlign: 'right' }}>
-                        <button
-                          type="button"
-                          className="btn btn-primary btn-sm"
-                          onClick={() => setAdjustingProduct(p)}
-                        >
-                          <Layers size={14} />
-                          <span>Adjust Stock</span>
-                        </button>
-                      </td>
-                    </tr>
+                      </div>
+
+                      <div className="mobile-card-stats" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                        <div className="mobile-stat-col">
+                          <span className="mobile-stat-label">Current Stock</span>
+                          <span
+                            className="mobile-stat-value"
+                            style={{
+                              fontSize: '1.25rem',
+                              color: isOut ? 'var(--rose-600)' : isLow ? 'var(--amber-600)' : 'var(--emerald-600)',
+                            }}
+                          >
+                            {p.quantity} units
+                          </span>
+                        </div>
+                        <div className="mobile-stat-col">
+                          <span className="mobile-stat-label">Threshold</span>
+                          <span className="mobile-stat-value" style={{ fontSize: '1.1rem' }}>
+                            {p.low_stock_threshold} units
+                          </span>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        style={{ width: '100%', marginTop: '0.25rem', padding: '0.65rem' }}
+                        onClick={() => setAdjustingProduct(p)}
+                      >
+                        <Layers size={16} />
+                        <span>Adjust Stock (+ / -)</span>
+                      </button>
+                    </div>
                   );
                 })}
-              </tbody>
-            </table>
+              </div>
+            </>
           )}
         </div>
       </div>

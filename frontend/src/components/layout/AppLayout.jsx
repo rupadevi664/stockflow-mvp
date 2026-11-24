@@ -4,10 +4,10 @@ import Sidebar from './Sidebar';
 import TopNav from './TopNav';
 
 const pageTitles = {
-  '/dashboard': 'Dashboard & Analytics',
-  '/products': 'Product Catalog',
-  '/stock': 'Stock Operations & Thresholds',
-  '/settings': 'Organization Settings',
+  '/dashboard': 'Dashboard',
+  '/products': 'Products',
+  '/stock': 'Stock Operations',
+  '/settings': 'Settings',
 };
 
 const AppLayout = () => {
