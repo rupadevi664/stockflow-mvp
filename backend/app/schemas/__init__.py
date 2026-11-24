@@ -8,7 +8,8 @@ from app.schemas.auth import (
 from app.schemas.product import (
     ProductCreate,
     ProductUpdate,
-    ProductResponse
+    ProductResponse,
+    ProductDeleteResponse
 )
 
 __all__ = [
@@ -19,5 +20,7 @@ __all__ = [
     "UserProfileResponse",
     "ProductCreate",
     "ProductUpdate",
-    "ProductResponse"
+    "ProductResponse",
+    "ProductDeleteResponse"
 ]
+

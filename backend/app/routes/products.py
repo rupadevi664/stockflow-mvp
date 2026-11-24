@@ -7,7 +7,12 @@ from sqlalchemy.exc import IntegrityError
 from app.database import get_db
 from app.models.product import Product
 from app.models.user import User
-from app.schemas.product import ProductCreate, ProductUpdate, ProductResponse
+from app.schemas.product import (
+    ProductCreate,
+    ProductUpdate,
+    ProductResponse,
+    ProductDeleteResponse
+)
 from app.routes.auth import get_current_user
 
 logger = logging.getLogger(__name__)
@@ -176,4 +181,42 @@ def update_product(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred while updating the product"
+        )
+
+
+# 5. DELETE PRODUCT BY ID
+@router.delete(
+    "/{product_id}",
+    response_model=ProductDeleteResponse,
+    summary="Delete a product by ID"
+)
+def delete_product(
+    product_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    product = db.query(Product).filter(
+        Product.id == product_id,
+        Product.organization_id == current_user.organization_id
+    ).first()
+
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found"
+        )
+
+    try:
+        db.delete(product)
+        db.commit()
+        return ProductDeleteResponse(
+            message="Product deleted successfully",
+            id=product_id
+        )
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Unexpected error deleting product {product_id}: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while deleting the product"
         )

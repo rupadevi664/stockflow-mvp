@@ -75,3 +75,9 @@ class ProductResponse(ProductBase):
     updated_at: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ProductDeleteResponse(BaseModel):
+    message: str
+    id: int
+
