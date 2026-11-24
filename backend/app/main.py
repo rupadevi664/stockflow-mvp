@@ -1,3 +1,4 @@
+import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -10,6 +11,7 @@ from app.routes.dashboard import router as dashboard_router
 from app.routes.stock import router as stock_router
 from app.routes.products import router as products_router
 
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -33,8 +35,12 @@ app.add_middleware(
 )
 
 
-# Create database tables for the MVP
-Base.metadata.create_all(bind=engine)
+# Create database tables for the MVP safely on startup
+try:
+    Base.metadata.create_all(bind=engine)
+    logger.info("Database tables initialized successfully.")
+except Exception as e:
+    logger.warning(f"Database table initialization deferred: {str(e)}")
 
 
 # Register routes
