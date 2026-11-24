@@ -18,9 +18,15 @@ app = FastAPI(
 )
 
 # Configure CORS for frontend integration
+cors_origins = (
+    [origin.strip() for origin in settings.CORS_ORIGINS.split(",") if origin.strip()]
+    if settings.CORS_ORIGINS != "*"
+    else ["*"]
+)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -39,10 +45,6 @@ app.include_router(stock_router)
 app.include_router(products_router)
 
 
-
-
-
-
 @app.get("/")
 def home():
     return {
@@ -54,5 +56,7 @@ def home():
 @app.get("/health")
 def health_check():
     return {
-        "status": "healthy"
+        "status": "healthy",
+        "app": settings.APP_NAME,
+        "version": settings.APP_VERSION
     }
